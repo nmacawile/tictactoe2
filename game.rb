@@ -48,18 +48,29 @@ module TicTacToe
 		def print_board
 			#grid.display_normal
 			grid.display_numpad
+			puts
 		end
 		
 		def over?
 			 win? || draw?
 		end
 		
-		def draw?
-			grid.full?
+		def draw?			
+			if grid.full?
+				puts "It's a draw!"
+				true
+			else
+				false
+			end
 		end
 		
 		def win?
-			grid.win?(current_player.symbol)
+			if grid.win?(current_player.symbol)
+				puts "#{current_player} wins!"
+				true
+			else
+				false
+			end
 		end
 		
 		def current_player

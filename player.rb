@@ -34,37 +34,72 @@ module TicTacToe
 	
 	class ComputerPlayer < Player
 		def turn
-			go_for_win
-			block
-			center
-			setup
-			random
+			print "#{self}'s turn (#{symbol}): "
+			go_for_win || block ||
+			center || setup || random 
 		end
 
 		def patterns
 			Grid::PATTERNS
 		end
+
+		def fill_line
+			moves = []
+			patterns.each do |pattern| 
+				if pattern.has_exactly?(2) { |pos| yield(pos) }
+					cell = pattern.find { |pos| board[pos].free? }
+					moves << cell unless cell.nil?
+				end
+			end
+
+			unless moves.empty? 
+				pick = moves.sample
+				puts pick
+				board[pick].mark(symbol)
+			else
+				false
+			end
+		end
 		
 		def go_for_win
-			patterns.each
+			fill_line { |pos| board[pos].value == symbol }
 		end
 
 		def block
-
+			fill_line { |pos| board[pos].value != symbol && board[pos].marked? }
 		end
 
 		def center
-
+			if board[5].free?
+				puts 5
+				board[5].mark(symbol)
+			else
+				false
+			end
 		end
 
 		def setup
+			moves = []
+			patterns.each do |pattern|
+				if pattern.any? { |pos| board[pos].value == symbol }
+					moves.concat(pattern.find_all { |pos| board[pos].free? })
+				end
+			end
 
+			unless moves.empty? 
+				pick = moves.sample
+				puts pick
+				board[pick].mark(symbol)
+			else
+				false
+			end
 		end
 
 		def random
-
+			pick = board.free_positions.sample
+			puts pick
+			board[pick].mark(symbol)
 		end
-
 		
 		def to_s
 			"CPU"

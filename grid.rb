@@ -1,4 +1,5 @@
 require './cell'
+require 'set'
 
 module TicTacToe
 	class Grid < Array
@@ -26,8 +27,8 @@ module TicTacToe
 			self[1..9].all? { |cell| cell.marked? }
 		end
 		
-		def free_cells
-			self[1..9].select { |cell| cell.free? }
+		def free_positions
+			(1..9).select { |position| self[position].free? }
 		end
 		
 		def display_numpad
