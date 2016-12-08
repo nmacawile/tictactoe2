@@ -29,6 +29,7 @@ module TicTacToe
 		def play
 			loop do
 				print_board
+				self.current_player_id = rand(0..1)
 				loop do
 					player_turn
 					break if over?
