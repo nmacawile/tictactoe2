@@ -1,3 +1,4 @@
+require 'colorize'
 module TicTacToe
 	class Cell
 		
@@ -26,7 +27,7 @@ module TicTacToe
 		end
 		
 		def to_s
-			free? ? position.to_s : value.to_s
+			free? ? position.to_s.colorize(:light_black) : value.to_s
 		end
 	end
 end

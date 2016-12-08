@@ -4,7 +4,6 @@ require './helper.rb'
 
 module TicTacToe
 	class Game
-		
 		private
 		
 		attr_reader :players
@@ -13,13 +12,14 @@ module TicTacToe
 		
 		public
 		
-		attr_accessor :grid
+		attr_accessor :grid, :draws
 		
 		def initialize(player1_class, player1_name, player2_class, player2_name)
-			@players = [player1_class.new(self, player1_name, "X"), 
-						player2_class.new(self, player2_name, "O")]
+			@players = [player1_class.new(self, player1_name.colorize(:red), "X".colorize(:red)), 
+						player2_class.new(self, player2_name.colorize(:blue), "O".colorize(:blue))]
 			@grid = Grid.new
 			@current_player_id = 0
+			@draws = 0
 		end
 		
 		def new_grid
@@ -27,13 +27,19 @@ module TicTacToe
 		end
 		
 		def play
-			print_board
 			loop do
-				player_turn
-				break if over?
-				switch_player
+				print_board
+				loop do
+					player_turn
+					break if over?
+					switch_player
+				end
+				show_scores
+				print "Play again? (Type in 'Y' to play again): "
+				response = gets.chomp.upcase
+				break unless response == "Y"
+				new_grid
 			end
-			show_scores
 		end
 		
 		def player_turn
@@ -42,7 +48,11 @@ module TicTacToe
 		end
 		
 		def show_scores
-			puts "scores here"
+			puts
+			puts "Scores:"
+			players.each { |player|	puts "#{player}: #{player.score}" }
+			puts "Draws: #{draws}"
+			puts
 		end
 		
 		def print_board
@@ -58,6 +68,7 @@ module TicTacToe
 		def draw?			
 			if grid.full?
 				puts "It's a draw!"
+				self.draws += 1
 				true
 			else
 				false
@@ -67,6 +78,7 @@ module TicTacToe
 		def win?
 			if grid.win?(current_player.symbol)
 				puts "#{current_player} wins!"
+				current_player.score += 1
 				true
 			else
 				false

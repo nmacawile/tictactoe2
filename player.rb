@@ -4,11 +4,13 @@ require './grid'
 module TicTacToe
 	class Player
 		attr_reader :game, :name, :symbol
+		attr_accessor :score
 		
 		def initialize(game, name, symbol)
 			@game = game
 			@name = name
 			@symbol = symbol
+			@score = 0
 		end
 		
 		def board
@@ -81,7 +83,8 @@ module TicTacToe
 		def setup
 			moves = []
 			patterns.each do |pattern|
-				if pattern.any? { |pos| board[pos].value == symbol }
+				if pattern.any? { |pos| board[pos].value == symbol } &&
+				   pattern.none? { |pos| board[pos].marked? && board[pos].value != symbol }
 					moves.concat(pattern.find_all { |pos| board[pos].free? })
 				end
 			end
@@ -99,10 +102,6 @@ module TicTacToe
 			pick = board.free_positions.sample
 			puts pick
 			board[pick].mark(symbol)
-		end
-		
-		def to_s
-			"CPU"
 		end
 	end
 end
