@@ -38,7 +38,7 @@ module TicTacToe
 		def turn
 			print "#{self}'s turn (#{symbol}): "
 			go_for_win || block ||
-			center || setup || random 
+			center || corner || setup || random 
 		end
 
 		def patterns
@@ -89,6 +89,20 @@ module TicTacToe
 				end
 			end
 
+			unless moves.empty? 
+				pick = moves.sample
+				puts pick
+				board[pick].mark(symbol)
+			else
+				false
+			end
+		end
+
+		def corner
+			moves = board.free_positions.select do |pos|
+				pos.odd?
+			end
+			
 			unless moves.empty? 
 				pick = moves.sample
 				puts pick
