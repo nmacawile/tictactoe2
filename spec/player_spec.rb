@@ -10,43 +10,34 @@ describe TicTacToe::HumanPlayer do
 	describe "#turn" do
 
 		let(:index) { double }
+		let(:cell) { double }
 
 		before do			
-			is_expected.to receive(:loop).and_yield
-			is_expected.to receive(:print)
-			is_expected.to receive_message_chain(:gets, :chomp, :to_i) { index }
+			allow(subject).to receive(:loop).and_yield
+			allow(subject).to receive(:puts)
+			allow(subject).to receive(:print)
+					
 		end
 
 		after do
 			subject.turn
 		end
 
-		context "when cell is already marked" do
-			it "doesn't mark cell" do			
-				is_expected.to receive(:puts).with(/Invalid/)
-				expect(index).to receive(:between?).and_return(true)
-				cell = double
-				expect(game).to receive_message_chain(:grid, :[]).with(index) { cell }
-				expect(cell).to receive(:mark).with("foo").and_return(false)
+		context "when cell index is valid" do
+			it "marks cell" do
+				allow(subject).to receive_message_chain(:gets, :chomp, :to_i) { 9 }
+				expect(game).to receive_message_chain(:grid, :[]).with(9) { cell }
+				expect(cell).to receive(:mark).with("foo")
 			end
 		end
 
 		context "when cell index is invalid" do
 			it "doesn't mark cell" do
-				is_expected.to receive(:puts).with(/Invalid/)
-				expect(index).to receive(:between?).and_return(false)
+				allow(subject).to receive_message_chain(:gets, :chomp, :to_i) { 10 }
+				expect(game).not_to receive(:grid)
+				expect(cell).not_to receive(:mark)
 			end
 		end
-
-		context "when cell is empty" do
-			it "marks cell" do
-				is_expected.not_to receive(:puts).with(/Invalid/)
-				expect(index).to receive(:between?).and_return(true)				
-				cell = double
-				expect(game).to receive_message_chain(:grid, :[]).with(index) { cell }
-				expect(cell).to receive(:mark).with("foo").and_return(true)
-			end
-		end		
 	end
 end
 
