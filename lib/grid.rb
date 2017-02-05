@@ -1,5 +1,4 @@
 require_relative 'cell'
-require 'set'
 
 module TicTacToe
 	class Grid < Array

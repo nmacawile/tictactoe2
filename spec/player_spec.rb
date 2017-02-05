@@ -1,4 +1,5 @@
 require 'player'
+require 'grid'
 
 describe TicTacToe::HumanPlayer do
 	let(:game) { double }
@@ -42,28 +43,133 @@ describe TicTacToe::HumanPlayer do
 end
 
 describe TicTacToe::ComputerPlayer do
-	context "when about to win" do
-	
+	let(:game) { double }
+
+	subject { TicTacToe::ComputerPlayer.new(game, "computer", "bar") }
+
+	before do
+		allow(game).to receive(:grid).and_return( TicTacToe::Grid.new )
+		allow(subject).to receive(:print)
+		allow(subject).to receive(:puts)
 	end
 
-	context "when about to lose" do
-	
-	end
+	describe "#turn" do
+		context "when about to win" do
+			before do 
+				game.grid[2].mark("bar")
+				game.grid[3].mark("bar")
+				game.grid[4].mark("foo")
+				game.grid[6].mark("foo")
+			end
 
-	context "when center is available" do
+			it "ignores any other weaker moves" do
+				is_expected.not_to receive(:block)
+				is_expected.not_to receive(:center)
+				is_expected.not_to receive(:setup)
+				is_expected.not_to receive(:random)
+			end
 
-	end
+			it "marks the winning cell" do			
+				expect { subject.turn }.to change(game.grid[1], :marked?).from(false).to(true)
+			end
 
-	context "when center is not avalable and a corner is available" do
+		end
 
-	end
+		context "when about to lose" do
+			before do
+				game.grid[1].mark("foo")
+				game.grid[7].mark("foo")
+			end
 
-	context "when player has another marked cell in this line" do
+			it "ignores any other weaker moves" do
+				is_expected.not_to receive(:center)
+				is_expected.not_to receive(:corner)
+				is_expected.not_to receive(:setup)
+				is_expected.not_to receive(:random)
+			end
 
-	end
+			it "marks the winning cell" do			
+				expect { subject.turn }.to change(game.grid[4], :marked?).from(false).to(true)
+			end
+		end
 
-	context "when no other strong move is available" do
+		context "when center is available" do
+			it "ignores any other weaker moves" do
+				is_expected.not_to receive(:corner)
+				is_expected.not_to receive(:setup)
+				is_expected.not_to receive(:random)
+			end
 
+			it "marks center cell" do
+				expect { subject.turn }.to change(game.grid[5], :marked?).from(false).to(true)
+			end	
+		end
+
+		context "when center is not available and a corner is available" do
+			before do
+				game.grid[5].mark("foo")
+				game.grid[7].mark("bar")
+				game.grid[9].mark("foo")
+				game.grid[3].mark("bar")
+			end
+
+			it "ignores any other weaker moves" do
+				is_expected.not_to receive(:setup)
+				is_expected.not_to receive(:random)
+			end
+
+			it "marks a corner cell" do
+				expect { subject.turn }.to change(game.grid[1], :marked?).from(false).to(true)
+			end	
+		end
+
+		context "when player has another marked cell in this line" do
+			before do
+				game.grid[4].mark("foo")
+			end
+
+			it "ignores any other weaker moves" do
+				is_expected.not_to receive(:random)
+			end
+
+			it "marks another cell in the same line" do
+				subject.turn
+				expect(game.grid.free_positions).to satisfy do |positions|
+					(
+						!positions.include?(1) ||
+						!positions.include?(7) ||
+						!positions.include?(5) ||
+						!positions.include?(6)
+					) && (
+						positions.include?(2) &&
+						positions.include?(3) &&
+						positions.include?(8) &&
+						positions.include?(9))
+				end
+			end	
+		end
+
+		context "when no other stronger move is available" do
+			before do
+				game.grid[1].mark("foo")
+				game.grid[3].mark("foo")
+				game.grid[5].mark("foo")
+				game.grid[7].mark("foo")
+				game.grid[9].mark("foo")
+			end
+
+			it "marks any available cell" do
+				subject.turn
+				expect(game.grid.free_positions).to satisfy do |positions|
+					(
+						!positions.include?(2) ||
+						!positions.include?(4) ||
+						!positions.include?(6) ||
+						!positions.include?(8)
+					)
+				end
+			end	
+		end
 	end
 
 end
