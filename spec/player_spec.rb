@@ -25,7 +25,7 @@ describe TicTacToe::HumanPlayer do
 		end
 
 		context "when cell index is valid" do
-			it "marks cell" do
+			it "attempts to mark cell" do
 				allow(subject).to receive_message_chain(:gets, :chomp, :to_i) { 9 }
 				expect(game).to receive_message_chain(:grid, :[]).with(9) { cell }
 				expect(cell).to receive(:mark).with("foo")
@@ -33,7 +33,7 @@ describe TicTacToe::HumanPlayer do
 		end
 
 		context "when cell index is invalid" do
-			it "doesn't mark cell" do
+			it "won't attempt to cell" do
 				allow(subject).to receive_message_chain(:gets, :chomp, :to_i) { 10 }
 				expect(game).not_to receive(:grid)
 				expect(cell).not_to receive(:mark)
