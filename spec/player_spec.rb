@@ -115,8 +115,8 @@ describe TicTacToe::ComputerPlayer do
 			it "marks a corner cell" do
 				subject.turn
 				expect(game.grid.free_positions).to satisfy do |positions|					
-						[1, 3, 7, 9].any? { |marked| !positions.include? marked } &&
-						[2, 4, 6, 8].all? { |marked| positions.include? marked }
+						[1, 3, 7, 9].any? { |c| !positions.include? c } &&
+						[2, 4, 6, 8].all? { |c| positions.include? c }
 				end
 			end	
 		end
@@ -133,8 +133,8 @@ describe TicTacToe::ComputerPlayer do
 			it "marks another cell in the same line" do
 				subject.turn
 				expect(game.grid.free_positions).to satisfy do |positions|					
-						[1, 7, 5, 6].any? { |marked| !positions.include? marked } &&
-						[2, 3, 8, 9].all? { |marked| positions.include? marked }
+						[1, 7, 5, 6].any? { |c| !positions.include? c } &&
+						[2, 3, 8, 9].all? { |c| positions.include? c }
 				end
 			end	
 		end
@@ -147,7 +147,7 @@ describe TicTacToe::ComputerPlayer do
 			it "marks any available cell" do
 				subject.turn
 				expect(game.grid.free_positions).to satisfy do |positions|					
-					[2, 4, 6, 8].any? { |marked| !positions.include? marked }					
+					[2, 4, 6, 8].any? { |c| !positions.include? c }					
 				end
 			end	
 		end
