@@ -56,10 +56,8 @@ describe TicTacToe::ComputerPlayer do
 	describe "#turn" do
 		context "when about to win" do
 			before do 
-				game.grid[2].mark("bar")
-				game.grid[3].mark("bar")
-				game.grid[4].mark("foo")
-				game.grid[6].mark("foo")
+				[1, 3].each { |c| game.grid[c].mark("bar") }
+				[4, 6].each { |c| game.grid[c].mark("foo") }
 			end
 
 			it "ignores any other weaker moves" do
@@ -70,15 +68,14 @@ describe TicTacToe::ComputerPlayer do
 			end
 
 			it "marks the winning cell" do			
-				expect { subject.turn }.to change(game.grid[1], :marked?).from(false).to(true)
+				expect { subject.turn }.to change(game.grid[2], :marked?).from(false).to(true)
 			end
 
 		end
 
 		context "when about to lose" do
 			before do
-				game.grid[1].mark("foo")
-				game.grid[7].mark("foo")
+				[1, 7].each { |c| game.grid[c].mark("foo") }
 			end
 
 			it "ignores any other weaker moves" do
@@ -107,10 +104,7 @@ describe TicTacToe::ComputerPlayer do
 
 		context "when center is not available and a corner is available" do
 			before do
-				game.grid[5].mark("foo")
-				game.grid[7].mark("bar")
-				game.grid[9].mark("foo")
-				game.grid[3].mark("bar")
+				game.grid[5].mark("foo")				
 			end
 
 			it "ignores any other weaker moves" do
@@ -119,7 +113,11 @@ describe TicTacToe::ComputerPlayer do
 			end
 
 			it "marks a corner cell" do
-				expect { subject.turn }.to change(game.grid[1], :marked?).from(false).to(true)
+				subject.turn
+				expect(game.grid.free_positions).to satisfy do |positions|					
+						[1, 3, 7, 9].any? { |marked| !positions.include? marked } &&
+						[2, 4, 6, 8].all? { |marked| positions.include? marked }
+				end
 			end	
 		end
 
@@ -134,39 +132,22 @@ describe TicTacToe::ComputerPlayer do
 
 			it "marks another cell in the same line" do
 				subject.turn
-				expect(game.grid.free_positions).to satisfy do |positions|
-					(
-						!positions.include?(1) ||
-						!positions.include?(7) ||
-						!positions.include?(5) ||
-						!positions.include?(6)
-					) && (
-						positions.include?(2) &&
-						positions.include?(3) &&
-						positions.include?(8) &&
-						positions.include?(9))
+				expect(game.grid.free_positions).to satisfy do |positions|					
+						[1, 7, 5, 6].any? { |marked| !positions.include? marked } &&
+						[2, 3, 8, 9].all? { |marked| positions.include? marked }
 				end
 			end	
 		end
 
 		context "when no other stronger move is available" do
 			before do
-				game.grid[1].mark("foo")
-				game.grid[3].mark("foo")
-				game.grid[5].mark("foo")
-				game.grid[7].mark("foo")
-				game.grid[9].mark("foo")
+				[1, 3, 5, 7 ,9].each { |c| game.grid[c].mark("foo") }
 			end
 
 			it "marks any available cell" do
 				subject.turn
-				expect(game.grid.free_positions).to satisfy do |positions|
-					(
-						!positions.include?(2) ||
-						!positions.include?(4) ||
-						!positions.include?(6) ||
-						!positions.include?(8)
-					)
+				expect(game.grid.free_positions).to satisfy do |positions|					
+					[2, 4, 6, 8].any? { |marked| !positions.include? marked }					
 				end
 			end	
 		end
