@@ -62,9 +62,6 @@ describe TicTacToe::ComputerPlayer do
 
 			it "ignores any other weaker moves" do
 				is_expected.not_to receive(:block)
-				is_expected.not_to receive(:center)
-				is_expected.not_to receive(:setup)
-				is_expected.not_to receive(:random)
 			end
 
 			it "marks the winning cell" do			
@@ -80,9 +77,6 @@ describe TicTacToe::ComputerPlayer do
 
 			it "ignores any other weaker moves" do
 				is_expected.not_to receive(:center)
-				is_expected.not_to receive(:corner)
-				is_expected.not_to receive(:setup)
-				is_expected.not_to receive(:random)
 			end
 
 			it "marks the winning cell" do			
@@ -92,14 +86,32 @@ describe TicTacToe::ComputerPlayer do
 
 		context "when center is available" do
 			it "ignores any other weaker moves" do
-				is_expected.not_to receive(:corner)
-				is_expected.not_to receive(:setup)
-				is_expected.not_to receive(:random)
+				is_expected.not_to receive(:escape)
 			end
 
 			it "marks center cell" do
 				expect { subject.turn }.to change(game.grid[5], :marked?).from(false).to(true)
 			end	
+		end
+
+		context "when center is marked by player and opponent has marked each opposite corners" do
+			before do 
+				game.grid[5].mark("bar")
+				[1, 9].each { |c| game.grid[c].mark("foo") }
+			end
+
+			it "ignores any other weaker moves" do
+				is_expected.not_to receive(:corner)
+			end
+
+			it "prevents being trapped by marking a non-corner cell" do
+				subject.turn
+				expect(game.grid.free_positions).to satisfy do |positions|					
+					[2, 4, 6, 8].any? { |c| !positions.include? c } &&
+					[3, 7].all? { |c| positions.include? c }
+				end
+			end
+
 		end
 
 		context "when center is not available and a corner is available" do
@@ -109,7 +121,6 @@ describe TicTacToe::ComputerPlayer do
 
 			it "ignores any other weaker moves" do
 				is_expected.not_to receive(:setup)
-				is_expected.not_to receive(:random)
 			end
 
 			it "marks a corner cell" do

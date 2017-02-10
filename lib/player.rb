@@ -38,7 +38,7 @@ module TicTacToe
 		def turn
 			print "#{self}'s turn (#{symbol}): "
 			go_for_win || block ||
-			center || corner || setup || random 
+			center || escape || corner || setup || random 
 		end
 
 		def patterns
@@ -75,6 +75,37 @@ module TicTacToe
 			if board[5].free?
 				puts 5
 				board[5].mark(symbol)
+			else
+				false
+			end
+		end
+
+		def escape
+			moves = []
+			patterns.each do |pattern|
+				if pattern.all? { |pos| pos.odd? } &&
+				   pattern.values_at(0, 2).each { |pos| 
+				   board[pos].marked? && board[pos].value != symbol 
+				   } && 
+				   board[pattern[1]].marked? && 
+				   board[pattern[1]].value == symbol &&
+				   board.free_positions.count do |pos|
+						pos.odd?
+					end == 2 &&
+					 board.free_positions.count do |pos|
+						pos.even?
+					end == 4
+
+					moves = board.free_positions.select do |pos|
+						pos.even?
+					end
+				end
+			end
+			
+			unless moves.empty? 
+				pick = moves.sample
+				puts pick
+				board[pick].mark(symbol)
 			else
 				false
 			end
